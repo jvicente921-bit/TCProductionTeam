@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Production Team — Sunday Ready</title>
+<style>
+  :root{
+    --crimson:#C0392B;
+    --crimson-dark:#a5301f;
+    --crimson-tint:#fbebe9;
+    --offwhite:#F7F7F7;
+    --card:#ffffff;
+    --ink:#1a1a1a;
+    --muted:#6b7280;
+    --border:#e6e3e1;
+    --green:#1e8e5a;
+    --amber:#a86a1a;
+    --amber-tint:#fdf3e6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--offwhite);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:#1a1a1a;
+    color:#fff;
+    padding:22px 18px 20px;
+    border-bottom:4px solid var(--crimson);
+  }
+  header .wrap{max-width:900px;margin:0 auto;}
+  header h1{
+    margin:0 0 4px;
+    font-size:22px;
+    letter-spacing:.2px;
+  }
+  header h1 span{color:var(--crimson);}
+  header p{margin:0 0 14px;color:#c9c9c9;font-size:13.5px;}
+  .playbook-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--crimson);
+    color:#fff;
+    text-decoration:none;
+    padding:9px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:600;
+  }
+  .playbook-link:hover{background:var(--crimson-dark);}
+
+  .sync-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin-left:10px;
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:12.5px;
+    font-weight:600;
+    background:#333;
+    color:#c9c9c9;
+    vertical-align:middle;
+  }
+  .sync-badge.ok{background:rgba(30,142,90,.18);color:#7cd6ac;}
+  .sync-badge.bad{background:rgba(192,57,43,.22);color:#f3a89e;}
+
+  nav.tabs{
+    display:flex;
+    max-width:900px;
+    margin:0 auto;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  nav.tabs button{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:14px 8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+  }
+  nav.tabs button.active{
+    color:var(--crimson);
+    border-bottom:3px solid var(--crimson);
+  }
+
+  main{max-width:900px;margin:0 auto;padding:18px 16px 60px;}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+
+  .banner{
+    background:var(--crimson-tint);
+    border:1px solid #f0cfc9;
+    border-radius:12px;
+    padding:12px 16px;
+    font-size:13.5px;
+    color:#7a281d;
+    margin-bottom:16px;
+  }
+  .banner strong{color:var(--crimson-dark);}
+
+  .role-picker{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .role-pill{
+    border:1.5px solid var(--border);
+    background:#fff;
+    padding:9px 13px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .role-pill.active{
+    background:var(--crimson);
+    border-color:var(--crimson);
+    color:#fff;
+  }
+
+  .role-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    margin-bottom:16px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .role-card .head{
+    background:var(--crimson);
+    color:#fff;
+    padding:16px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .role-card .head h2{margin:0;font-size:18px;}
+  .role-card .head .tagline{font-size:12.5px;opacity:.9;font-weight:400;margin-top:2px;}
+  .assigned-line{font-size:12.5px;opacity:.95;font-weight:600;margin-top:4px;display:none;}
+  .assigned-line.show{display:block;}
+  .badge{
+    background:rgba(255,255,255,.18);
+    padding:6px 11px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  .my-notes-textarea{
+    width:100%;
+    min-height:320px;
+    resize:vertical;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+    font-family:inherit;
+    font-size:16px;
+    line-height:1.5;
+    color:var(--ink);
+    background:var(--offwhite);
+  }
+  .my-notes-textarea:focus{outline:2px solid var(--crimson);outline-offset:1px;}
+  .my-notes-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:10px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .my-notes-status{font-size:12.5px;color:var(--muted);}
+  .my-notes-clear{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .my-notes-clear:hover{background:var(--crimson-tint);color:var(--crimson-dark);border-color:var(--crimson);}
+  .role-card .progress-wrap{padding:14px 18px 0;}
+  .progress-track{
+    height:8px;
+    background:#eee;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--green);
+    width:0%;
+    transition:width .25s ease;
+  }
+  .progress-label{font-size:12px;color:var(--muted);margin-top:6px;}
+
+  .section{padding:16px 18px;border-top:1px solid var(--border);}
+  .section h3{
+    margin:0 0 4px;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:var(--crimson-dark);
+  }
+  .section .sub-note{font-size:12px;color:var(--muted);margin:0 0 10px;}
+  ul.checklist{list-style:none;margin:0;padding:0;}
+  ul.checklist li{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px dashed #ececec;
+    font-size:14.5px;
+    line-height:1.4;
+  }
+  ul.checklist li:last-child{border-bottom:none;}
+  ul.checklist input[type=checkbox]{
+    width:19px;height:19px;flex:0 0 19px;
+    accent-color:var(--crimson);
+    margin-top:1px;
+    cursor:pointer;
+  }
+  ul.checklist label{cursor:pointer;}
+  ul.checklist li.checked label{color:var(--muted);text-decoration:line-through;}
+  .item-body{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .oos-readonly{padding-left:0;}
+  .oos-readonly-title{font-weight:600;}
+  .oos-readonly .item-body{gap:4px;}
+  .vocals-notes{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid #ececec;
+  }
+  .vocals-notes h3{margin:0 0 8px;}
+  .vocals-notes-body{
+    font-size:14px;
+    line-height:1.7;
+    color:var(--ink);
+    background:var(--crimson-tint);
+    border:1px solid #f0cfc9;
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .item-videos{display:flex;flex-wrap:wrap;gap:12px;}
+  .vid-link{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--crimson-dark);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+  }
+  .vid-link:hover{text-decoration:underline;}
+
+  .reminders-block{
+    margin:0 18px 16px;
+    background:var(--amber-tint);
+    border:1px dashed #e8c78f;
+    border-radius:12px;
+    padding:14px 16px;
+  }
+  .reminders-block .r-head{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:var(--amber);
+    margin-bottom:8px;
+  }
+  .reminders-block .r-sub{font-size:11.5px;color:var(--muted);margin:-4px 0 10px;}
+  .reminders-block ul{list-style:none;margin:0;padding:0;}
+  .reminders-block li{
+    font-size:14px;
+    line-height:1.5;
+    padding:4px 0 4px 20px;
+    position:relative;
+    color:#4a4a4a;
+  }
+  .reminders-block li::before{
+    content:"📌";
+    position:absolute;
+    left:0;
+    top:4px;
+    font-size:12px;
+  }
+
+  .subsection-label{
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:14px 0 4px;
+  }
+  .reset-row{padding:0 18px 18px;}
+  .reset-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:12.5px;
+    padding:7px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--crimson);color:var(--crimson-dark);}
+
+  .allteam{
+    background:#fff;
+    border:1.5px solid var(--crimson);
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .allteam h3{margin:0 0 10px;font-size:14px;color:var(--crimson-dark);text-transform:uppercase;letter-spacing:.4px;}
+  .allteam ol{margin:0;padding-left:18px;font-size:14px;line-height:1.6;}
+
+  .card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .card h3{margin:0 0 4px;font-size:15px;}
+  .card .desc{font-size:12.5px;color:var(--muted);margin:0 0 12px;}
+  .linklist{list-style:none;margin:0;padding:0;}
+  .linklist li{margin-bottom:8px;}
+  .linklist a{
+    display:block;
+    background:var(--offwhite);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px 12px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:600;
+  }
+  .linklist a small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:2px;word-break:break-all;}
+  .linklist a:hover{border-color:var(--crimson);}
+
+  .creds{
+    background:var(--crimson-tint);
+    border:1px solid #f0cfc9;
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:13px;
+    margin:10px 0;
+  }
+  .creds div{margin-bottom:2px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .tag{font-size:11.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--border);}
+  .tag.avoid{color:#a5301f;border-color:#f0cfc9;background:#fdf3f2;}
+  .tag.good{color:var(--green);border-color:#cdead9;background:#f0faf4;}
+
+  .eq-table-wrap{overflow-x:auto;margin-top:10px;}
+  table.eq-table{border-collapse:collapse;width:100%;font-size:12px;min-width:560px;}
+  table.eq-table th, table.eq-table td{
+    border:1px solid var(--border);
+    padding:6px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.eq-table th{background:var(--offwhite);font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);}
+  table.eq-table td:first-child{font-weight:700;white-space:nowrap;}
+
+  .leadership-grid{display:flex;flex-direction:column;gap:10px;}
+  .leader-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--offwhite);
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .leader-row .name{font-weight:700;font-size:14px;}
+  .leader-row .role{font-size:11.5px;color:var(--muted);}
+  .leader-row .note{font-size:12px;color:var(--muted);text-align:right;max-width:50%;}
+
+  footer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+    padding:20px 16px 40px;
+  }
+
+  /* ---------- MOBILE (phones) ---------- */
+  @media (max-width: 600px) {
+    header{padding:16px 14px 14px;}
+    header h1{font-size:19px;}
+    header p{font-size:12.5px;margin-bottom:12px;}
+    .playbook-link{font-size:12.5px;padding:9px 12px;}
+    .sync-badge{font-size:11.5px;padding:6px 10px;margin-left:0;margin-top:6px;}
+
+    nav.tabs button{font-size:12px;padding:12px 4px;letter-spacing:-.1px;}
+
+    main{padding:14px 10px 50px;}
+    .banner{padding:11px 13px;font-size:13px;}
+
+    .role-picker{gap:6px;}
+    .role-pill{padding:9px 12px;font-size:12.5px;}
+
+    .role-card .head{padding:14px 14px;}
+    .role-card .head h2{font-size:16.5px;}
+    .section{padding:14px 14px;}
+    .reminders-block{margin:0 14px 14px;}
+    .reset-row{padding:0 14px 16px;}
+
+    ul.checklist li{font-size:14px;gap:9px;}
+    ul.checklist input[type=checkbox]{
+      width:22px;height:22px;flex:0 0 22px;
+    }
+
+    .card, .allteam{padding:14px;}
+
+    .leader-row{flex-wrap:wrap;gap:4px 10px;}
+    .leader-row .note{max-width:100%;text-align:left;}
+
+    table.eq-table{font-size:11px;}
+
+    .my-notes-textarea{min-height:220px;padding:12px;}
+    .my-notes-footer{align-items:flex-start;}
+  }
+
+  /* Slightly larger touch targets on any touch device, phone or tablet */
+  @media (pointer: coarse) {
+    .tab-btn, .role-pill, .reset-btn, .my-notes-clear{min-height:40px;}
+    ul.checklist li{padding:10px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>TC Production <span>Sunday Ready</span></h1>
+    <p>Together Church Production Team · Pre/Post-service checklists, live reminders, Monday rehearsal, and training resources</p>
+    <a class="playbook-link" href="https://docs.google.com/presentation/d/1dvTG8XDnrgv0-uzT_XsvfAJoQRTUkDFh_2mq2BaygyA/edit?usp=sharing" target="_blank" rel="noopener">📖 Full Production Playbook ↗</a>
+    <span class="sync-badge" id="sync-status-badge" style="display:none;">● Connecting…</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="sunday">Sunday Checklist</button>
+  <button class="tab-btn" data-tab="monday">Monday Rehearsal</button>
+  <button class="tab-btn" data-tab="resources">Resources</button>
+  <button class="tab-btn" data-tab="notes">My Notes</button>
+</nav>
+
+<main>
+
+  <!-- SUNDAY TAB -->
+  <section id="sunday" class="tabpanel active">
+    <div class="banner">
+      <strong>Sunday window:</strong> Arrive 7:15 AM – 1:30 PM · Team Huddle 7:35 AM · Pre-Service checks run 7:30–8:00 AM.
+      Check off Pre-Service and Post-Service items as you go. The 📌 "Live Reminders" section is just what to keep in mind
+      during the service — no check-off needed there.
+    </div>
+
+    <div class="banner" id="week-team-banner" style="display:none;"></div>
+
+    <div class="role-picker" id="sunday-role-picker"></div>
+
+    <div id="sunday-role-card"></div>
+
+    <div id="sunday-oos-card"></div>
+
+    <div class="allteam">
+      <h3>All Team — Every Role</h3>
+      <ol>
+        <li>Own your station. Everything with excellence.</li>
+        <li>If you don't know something, ask. If you're not sure, ask.</li>
+        <li>Headsets need to be worn at all times, including in between services.</li>
+        <li>Be in your position at least 10 minutes prior to service start time.</li>
+        <li>Follow cues from the Production Director.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- MONDAY TAB -->
+  <section id="monday" class="tabpanel">
+    <div class="banner">
+      <strong>Rehearsal:</strong> Mondays, 6:30 PM – 8:30 PM. Use this to prep gear, cues, and content ahead of Sunday.
+    </div>
+
+    <div class="role-picker" id="monday-role-picker"></div>
+
+    <div id="monday-role-card"></div>
+  </section>
+
+  <!-- RESOURCES TAB -->
+  <section id="resources" class="tabpanel">
+
+    <div class="banner">
+      <strong>Filter by role</strong> to cut the scrolling — shared resources (playbook, leadership, song bank) always stay visible.
+    </div>
+
+    <div class="role-picker" id="resources-role-picker"></div>
+
+    <div class="card res-card" data-role="shared">
+      <h3>Full Production Playbook</h3>
+      <p class="desc">The complete team playbook — scope, roles, leadership, and full checklists.</p>
+      <ul class="linklist">
+        <li><a href="https://docs.google.com/presentation/d/1dvTG8XDnrgv0-uzT_XsvfAJoQRTUkDFh_2mq2BaygyA/edit?usp=sharing" target="_blank" rel="noopener">Open the Playbook (Google Slides) ↗</a></li>
+      </ul>
+    </div>
+
+    <div class="card res-card" data-role="propresenter">
+      <h3>ProPresenter Essentials</h3>
+      <p class="desc">Straight from Renewed Vision (makers of ProPresenter) — start here if you're new to the role.</p>
+      <ul class="linklist">
+        <li><a href="https://www.youtube.com/watch?v=M7z-I2eU654" target="_blank" rel="noopener">Volunteer Operator's Guide To ProPresenter 7<small>Built for church volunteers — how to run a live service</small></a></li>
+        <li><a href="https://www.youtube.com/watch?v=tb7UatDBGAI" target="_blank" rel="noopener">The Complete Beginner's Guide To ProPresenter 7<small>Full walkthrough of the interface and basics</small></a></li>
+        <li><a href="https://support.renewedvision.com/hc/en-us/articles/360041345954-Understanding-The-ProPresenter-User-Interface" target="_blank" rel="noopener">Understanding The ProPresenter User Interface<small>Labeled screenshots of every part of the screen — toolbar, libraries, slide view, media bin, preview window, show controls</small></a></li>
+        <li><a href="https://www.youtube.com/watch?v=Vbi5Z30fav8" target="_blank" rel="noopener">ProPresenter 7 Interface Overview (video)<small>Video walkthrough of the same layout</small></a></li>
+        <li><a href="https://www.youtube.com/watch?v=jBXeOMAhSKc" target="_blank" rel="noopener">ProPresenter — Settings<small>General app settings overview</small></a></li>
+      </ul>
+    </div>
+
+    <div class="card res-card" data-role="propresenter">
+      <h3>Required Macros — Quick Reference</h3>
+      <p class="desc">Confirm these are built and named correctly before every service.</p>
+      <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7;color:var(--ink);">
+        <li><strong>Songs</strong> — Praise/Worship Macro</li>
+        <li><strong>Host Slides</strong> — Host Macro</li>
+        <li><strong>Sermon Slides</strong> — Sermon Macro (timer auto-set to 45 min)
+          <ul style="margin-top:4px;">
+            <li>Church logo</li>
+            <li>Sermon Series logo (with macro)</li>
+            <li>Sermon Series logo (no macro)</li>
+            <li>Sermon Title logo</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card res-card" data-role="propresenter">
+      <h3>ProPresenter Training</h3>
+      <p class="desc">Tutorial playlists — start here if you're new to the role.</p>
+      <ul class="linklist" id="res-propresenter"></ul>
+    </div>
+
+    <div class="card res-card" data-role="propresenter">
+      <h3>ProPresenter Worship Backgrounds</h3>
+      <p class="desc">Log into artgrid.io to source background footage for worship.</p>
+      <div class="creds">
+        <div><strong>Site:</strong> <a href="https://artgrid.io" target="_blank" rel="noopener">artgrid.io</a></div>
+        <div><strong>Username:</strong> subscriptions@togetherchurch.co</div>
+        <div><strong>Password:</strong> jehmet-0qyxre-bybxuV</div>
+      </div>
+      <p class="desc" style="margin-bottom:0;">Search directly, or go to "Video Themes" → "Abstract" to start browsing.</p>
+      <div class="tags">
+        <span class="tag avoid">Avoid: people</span>
+        <span class="tag avoid">Avoid: psychedelic images</span>
+        <span class="tag avoid">Avoid: strobing images</span>
+        <span class="tag avoid">Avoid: fast motion</span>
+        <span class="tag good">Look for: abstract</span>
+        <span class="tag good">Look for: darker exposure</span>
+        <span class="tag good">Look for: one dimensional</span>
+        <span class="tag good">Look for: monochrome / simple colors</span>
+      </div>
+    </div>
+
+    <div class="card res-card" data-role="audio">
+      <h3>X32 Board Essentials</h3>
+      <p class="desc">Labeled layout of the Behringer X32 — start here if you're new to the board.</p>
+      <ul class="linklist">
+        <li><a href="https://mediadl.musictribe.com/media/PLM/data/docs/P0ASF/QSG_BE_0603-ACE_X32_WW.pdf" target="_blank" rel="noopener">X32 Quick Start Guide (official PDF)<small>Behringer/Music Tribe — front panel diagram and section-by-section overview</small></a></li>
+        <li><a href="https://www.youtube.com/watch?v=WgFMM7dbqck" target="_blank" rel="noopener">Getting To Know The X32: Channel Strip<small>Official Behringer video — gain, EQ, dynamics, sends, pan explained</small></a></li>
+        <li><a href="https://www.sweetwater.com/sweetcare/articles/getting-to-know-your-behringer-x32/" target="_blank" rel="noopener">Getting to Know Your Behringer X32<small>Sweetwater guide — layout, routing, and workflow basics</small></a></li>
+        <li><a href="https://www.youtube.com/watch?v=_UeGxfbSV9U" target="_blank" rel="noopener">Getting Started with Your Behringer X32 (video)<small>Sweetwater walkthrough</small></a></li>
+      </ul>
+    </div>
+
+    <div class="card res-card" data-role="audio">
+      <h3>Audio Training</h3>
+      <p class="desc">Tutorial playlists for the Audio Engineer role.</p>
+      <ul class="linklist" id="res-audio"></ul>
+    </div>
+
+    <div class="card">
+      <h3>Why the Power Order Matters (X32 + Rack + Speakers)</h3>
+      <p class="desc" style="margin-bottom:10px;">Powering gear on/off in the wrong order sends a pop or thump through the signal chain that gets amplified out to the speakers — repeated enough times, it degrades or damages drivers. The rule: the mixer goes on first and off last; amplifiers and powered speakers go on last and off first.</p>
+      <div class="creds" style="background:var(--offwhite);border-color:var(--border);">
+        <div><strong>Power ON:</strong> Board (X32) → Rack (processor) → Speakers &amp; Subs</div>
+        <div><strong>Power OFF:</strong> Speakers &amp; Subs → Rack (processor) → Board (X32)</div>
+      </div>
+      <p class="desc" style="margin:8px 0 0;">Also mute channels/bring the master down before powering off, and give the amps a couple seconds after power-down before cutting the rack — they store energy and need to discharge. On the X32, use Safe Shutdown when prompted so settings save cleanly.</p>
+    </div>
+
+    <div class="card res-card" data-role="audio">
+      <h3>Church Audio EQ Cheat Sheet</h3>
+      <p class="desc" style="margin-bottom:10px;">Quick-reference starting points, condensed from the team's EQ guide — treat these as a starting point, not a rule. Every room and band is different, so use your ears.</p>
+      <div class="eq-table-wrap">
+        <table class="eq-table">
+          <thead>
+            <tr><th>Source</th><th>Cut</th><th>Boost</th><th>High Pass</th><th>Low Pass</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kick</td><td>500 Hz (boxiness)</td><td>40–60 Hz (punch), 6 kHz (attack/air)</td><td>—</td><td>—</td></tr>
+            <tr><td>Snare</td><td>500 Hz (boxiness)</td><td>2.5 kHz (attack), 8 kHz (air/sparkle)</td><td>—</td><td>—</td></tr>
+            <tr><td>Toms</td><td>500 Hz (boxiness)</td><td>120–150 Hz rack / 90–105 Hz floor, 8 kHz (air)</td><td>120 Hz rack / 90 Hz floor</td><td>—</td></tr>
+            <tr><td>Cymbals</td><td>3–4 kHz (if harsh), 500 Hz (boxiness)</td><td>8 kHz (sparkle)</td><td>200 Hz</td><td>—</td></tr>
+            <tr><td>Bass Guitar</td><td>160 Hz (low/mid buildup)</td><td>60 Hz (body), 600–700 Hz (growl)</td><td>40 Hz</td><td>5 kHz (buzz/string noise)</td></tr>
+            <tr><td>Acoustic Guitar</td><td>200–400 Hz (low/mid buildup)</td><td>60 Hz (body), 600–700 Hz (growl)</td><td>40 Hz</td><td>5 kHz (buzz/string noise)</td></tr>
+            <tr><td>Electric Guitar</td><td>2–4 kHz (space for vocals), 400 Hz (low/mid buildup)</td><td>—</td><td>200 Hz</td><td>—</td></tr>
+            <tr><td>Lead Vocals</td><td>8 kHz (sibilance), 3–4 kHz (harshness), 300–350 Hz (plosives/mud)</td><td>—</td><td>200–250 Hz</td><td>—</td></tr>
+            <tr><td>Tracks — Keys</td><td>2–4 kHz (space for vocals)</td><td>—</td><td>200 Hz</td><td>—</td></tr>
+            <tr><td>Tracks — Percussion</td><td>3–4 kHz (if harsh)</td><td>60 Hz</td><td>60 Hz</td><td>—</td></tr>
+            <tr><td>Tracks — BGVs</td><td>3–4 kHz (room for lead)</td><td>—</td><td>200 Hz</td><td>6 kHz (sit behind lead)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="desc" style="margin:10px 0 0;">Source: The Church Audio EQ Guide by MxU — <a href="https://www.getmxu.com" target="_blank" rel="noopener" style="color:var(--crimson-dark);font-weight:600;">getmxu.com</a> for more EQ help.</p>
+      <ul class="linklist" style="margin-top:10px;">
+        <li><a href="https://thevocalmarket.com/blogs/how-to/vocal-eq-cheat-sheet-for-music-producers-2026" target="_blank" rel="noopener">Vocal EQ Cheat Sheet (Deep Dive)<small>Frequency-by-frequency breakdown for vocals — muddy, boxy, buried, harsh, thin fixes</small></a></li>
+      </ul>
+    </div>
+
+    <div class="card res-card" data-role="lighting">
+      <h3>Lights Training</h3>
+      <p class="desc">Tutorial playlists for the Lighting Tech role.</p>
+      <ul class="linklist" id="res-lights"></ul>
+    </div>
+
+    <div class="card res-card" data-role="shared">
+      <h3>Worship Team Resources</h3>
+      <p class="desc">Song bank — check before services to know the lineup.</p>
+      <ul class="linklist" id="res-worship"></ul>
+    </div>
+
+    <div class="card res-card" data-role="shared">
+      <h3>Team Leadership</h3>
+      <p class="desc">Don't hesitate to reach out.</p>
+      <div class="leadership-grid">
+        <div class="leader-row">
+          <div><div class="name">Pastor Tim</div><div class="role">Executive Pastor</div></div>
+          <div class="note">Overall church leadership & team vision</div>
+        </div>
+        <div class="leader-row">
+          <div><div class="name">Tony</div><div class="role">Production Director / Producer</div></div>
+          <div class="note">Team health, cue-calling, team development</div>
+        </div>
+        <div class="leader-row">
+          <div><div class="name">Juan</div><div class="role">Production Director / Producer</div></div>
+          <div class="note">Team health, cue-calling, team development</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card res-card" data-role="shared">
+      <h3>How to Use These Resources</h3>
+      <p class="desc" style="margin-bottom:6px;">New team members: start with ProPresenter and your role-specific playlists to learn your station.</p>
+      <p class="desc" style="margin-bottom:6px;">Quick reference: bookmark your role's playlist for a refresher before serving.</p>
+      <p class="desc" style="margin-bottom:6px;">Song prep: check the Worship Team Song Bank before services.</p>
+      <p class="desc" style="margin-bottom:0;">Training: use these playlists during onboarding to build confidence fast.</p>
+    </div>
+
+  </section>
+
+  <!-- MY NOTES TAB (personal, this device only — never synced) -->
+  <section id="notes" class="tabpanel">
+    <div class="role-card">
+      <div class="head">
+        <div><h2>My Notes</h2><div class="tagline">Private scratchpad, just for you — saved on this device only, never shared with the team.</div></div>
+      </div>
+      <div class="section">
+        <textarea id="my-notes-textarea" class="my-notes-textarea" placeholder="Jot down anything you want to remember for Sunday — cues, reminders, questions for the team..."></textarea>
+        <div class="my-notes-footer">
+          <span class="my-notes-status" id="my-notes-status"></span>
+          <button type="button" class="my-notes-clear" id="my-notes-clear">Clear notes</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>PAPA: Presence · Attitude · Passion · Approachability — Together Church Production Team</footer>
+
+<script>
+// ---------- UTIL ----------
+// Escapes text pulled from Planning Center (titles, notes, names, URLs, etc.)
+// before it's inserted via innerHTML, since this page is published publicly.
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ---------- DATA ----------
+// Each role: sunday.checklist = check-off sections (Pre-Service / Between Services / Post-Service)
+//            sunday.reminders = live, in-service reminders (NOT checkable — shown as a reference list)
+//            monday.checklist = rehearsal check-off items
+const ROLES = [
+  {
+    id: "stage",
+    name: "Stage Manager",
+    tagline: "The Backbone — supports the entire on-stage environment.",
+    callTime: "Call: 7:30 AM",
+    sunday: {
+      checklist: {
+        "Pre-Service": [
+          "Install batteries in all mics",
+          "Place mics in stands",
+          "Replace IEM batteries",
+          "Confirm spare batteries and a backup mic are on hand",
+          "Power on and test headsets/comms — confirm correct channel",
+          "Power on TVs (Stage & Parents Lounge)",
+          "Power on LED wall",
+          "Power on Hazers (2)",
+          "Set up pastor's table (water + towel)",
+          "Set up outdoor speaker",
+          "Retrieve pastor's computer",
+          "Clear and clean the stage"
+        ],
+        "Between Services": [
+          "Check battery levels on all mics",
+          "Replace any low batteries",
+          "Confirm stage is clear and reset",
+          "Reset pastor's table as needed"
+        ],
+        "Post-Service": [
+          "Plug in all rechargeable batteries",
+          "Power off Hazers (2)",
+          "Power off LED wall",
+          "Power off TVs (Stage & Parents Lounge)",
+          "Clear stage and remove pulpit",
+          "Return pastor's computer",
+          "Tear down and power off outdoor speaker",
+          "Power off headsets/comms (last, once teardown is complete)"
+        ]
+      },
+      reminders: [
+        "Communicate all off-stage movement to the team",
+        "2-way communication with team and anyone backstage",
+        "Bring on/off any needed props (including table for sermon)",
+        "Stay close to the stage during service in case of emergency"
+      ]
+    },
+    monday: {
+      checklist: {
+        "Rehearsal": [
+          "Attend Monday rehearsal (6:30–8:30 PM)",
+          "Assist with stage setup and prop run-through as directed",
+          "Confirm mic stands, IEM packs, and pastor's table props are staged and ready",
+          "Confirm spare batteries and a backup mic are on hand"
+        ]
+      },
+      reminders: []
+    }
+  },
+  {
+    id: "audio",
+    name: "Audio Engineer",
+    tagline: "Live Sound — clear, consistent, distraction-free audio every week.",
+    callTime: "Call: 7:30 AM",
+    sunday: {
+      checklist: {
+        "Pre-Service": [
+          "Power on board (X32) first — bring master fader down before powering on",
+          "Power on rack (system processor)",
+          "Power on speakers and subs last — amps power on last to avoid pops/damage",
+          "Load show",
+          "Line check each input channel (vocals & instruments) individually",
+          "Perform full sound check",
+          "Confirm IEM/monitor mixes with each vocalist and musician",
+          "Test backing tracks / click playback",
+          "Test audio playback from video/media content",
+          "Validate all host mics",
+          "Check Parents Lounge volume",
+          "Confirm comms/walkie channel is working",
+          "Sound check complete by 7:50 AM",
+          "Load the Team Huddle song on iPad before service",
+          "Team of Teams Huddle (see service order)"
+        ],
+        "Post-Service": [
+          "Mute all channels and bring master fader down",
+          "Power down speakers and subs first — wait a few seconds, amps store energy",
+          "Power down rack",
+          "Save show",
+          "Power down board (X32) last — use Safe Shutdown if prompted"
+        ]
+      },
+      reminders: [
+        "Maintain dB levels between 87–95",
+        "Unmute pastor mic before speaking",
+        "Mute speaking mics during transitions",
+        "Monitor livestream audio"
+      ]
+    },
+    monday: {
+      checklist: {
+        "Rehearsal": [
+          "Listen to songs before you arrive",
+          "Run in-depth soundcheck and save show for Sunday",
+          "Label channels with team member names",
+          "Test talkback microphones",
+          "Confirm no inputs are clipping — check gain staging",
+          "Walk the room to check coverage",
+          "Listen to the livestream mix and adjust if needed"
+        ]
+      },
+      reminders: []
+    }
+  },
+  {
+    id: "propresenter",
+    name: "ProPresenter Operator",
+    tagline: "Visuals & Media — lyrics, graphics, videos, and sermon slides.",
+    callTime: "Call: 7:30 AM",
+    sunday: {
+      checklist: {
+        "Pre-Service": [
+          { text: "Power on LED Wall & Processor, Stage TV", videos: [{ label: "Screen Configuration", url: "https://www.youtube.com/watch?v=ROOFKBbvNns" }] },
+          { text: "Confirm connection to LED Wall (Quick Fix: reboot ProPresenter if the connection drops)", videos: [{ label: "Screen Configuration", url: "https://www.youtube.com/watch?v=ROOFKBbvNns" }] },
+          { text: "Create Sunday Playlist & add all content", videos: [{ label: "Creating Your First Playlist", url: "https://www.youtube.com/watch?v=pGSWDQIWWP0" }] },
+          "Confirm sermon slides are the final version from pastor",
+          "Confirm sermon slides include Church logo, Series logo (with & without macro), and Title logo",
+          { text: "Update \"Full Song\" arrangements", videos: [{ label: "Arrangements", url: "https://www.youtube.com/watch?v=jL9G_MD1Vb4" }] },
+          { text: "Add macros & timers", videos: [{ label: "Macros", url: "https://www.youtube.com/watch?v=08NRxdDFdHc" }, { label: "Timers", url: "https://www.youtube.com/watch?v=5DNRfCWyrww" }] },
+          "Confirm required macros are built: Praise/Worship, Host, Sermon (auto 45-min timer)",
+          "Review the printed Order of Service — confirm every video and slide is in place",
+          { text: "Confirm Stage Display is accurate for every song/section", videos: [{ label: "Stage Displays", url: "https://www.youtube.com/watch?v=f3USCthXZmE" }] },
+          "Test-play all video/media content for the day",
+          { text: "Confirm stage confidence monitor is showing correctly", videos: [{ label: "Stage Displays", url: "https://www.youtube.com/watch?v=f3USCthXZmE" }] },
+          "Review post-service shutdown checklist"
+        ],
+        "Post-Service": [
+          "Power down LED Wall Processor",
+          "Quit ProPresenter",
+          "Lock computer"
+        ]
+      },
+      reminders: [
+        { text: "Advance slides on cue", videos: [{ label: "Volunteer Operator's Guide", url: "https://www.youtube.com/watch?v=M7z-I2eU654" }] },
+        { text: "Fire macros on time", videos: [{ label: "Macros", url: "https://www.youtube.com/watch?v=08NRxdDFdHc" }] },
+        "Follow worship leader and pastor cues"
+      ]
+    },
+    monday: {
+      checklist: {
+        "Rehearsal": [
+          "Listen to songs before you arrive",
+          { text: "Power on Mac & LED Wall, Processor", videos: [{ label: "Screen Configuration", url: "https://www.youtube.com/watch?v=ROOFKBbvNns" }] },
+          { text: "Validate Sunday Playlist", videos: [{ label: "Creating Your First Playlist", url: "https://www.youtube.com/watch?v=pGSWDQIWWP0" }] },
+          { text: "Update song arrangements — confirm with worship leader if necessary", videos: [{ label: "Arrangements", url: "https://www.youtube.com/watch?v=jL9G_MD1Vb4" }] },
+          "Load Pastor's sermon slides"
+        ]
+      },
+      reminders: []
+    }
+  },
+  {
+    id: "lighting",
+    name: "Lighting Tech",
+    tagline: "Atmosphere — sets the visual environment without becoming a distraction.",
+    callTime: "Call: 7:30 AM",
+    sunday: {
+      checklist: {
+        "Pre-Service": [
+          "Create new cues if needed",
+          "Re-test key lights and confirm no cue drift since rehearsal"
+        ],
+        "Post-Service": [
+          "Unplug haze machine",
+          "Power down Mac"
+        ]
+      },
+      reminders: [
+        "Execute all lighting cues for House & Stage",
+        "Support all segment transitions",
+        "Manage haze machine timing"
+      ]
+    },
+    monday: {
+      checklist: {
+        "Rehearsal": [
+          "Listen to songs before you arrive",
+          "Plug in haze machine",
+          "Check haze liquid — refill if needed",
+          "Power on Mac & load show",
+          "Test key lights — confirm no position shift",
+          "Coordinate light backgrounds with ProPresenter Op",
+          "Set & test ALL cues for all transitions"
+        ]
+      },
+      reminders: []
+    }
+  },
+  {
+    id: "director",
+    name: "Production Director",
+    tagline: "Team Lead & Cue Caller — leads the team and keeps the service on track.",
+    callTime: "Call: 7:15 AM",
+    sunday: {
+      checklist: {
+        "Pre-Service": [
+          "Work with all teams",
+          "Print Order of Service",
+          "Confirm Team Huddle Song and Pastor's sermon notes before service",
+          "Confirm Audio and ProPresenter checks are complete before huddle",
+          "Run Cue-to-Cue 8:30–8:40 AM to prepare for service",
+          "Lead team huddle (service order, prayer)",
+          "Confirm all stations are set",
+          "Turn on Live Stream at 9:00 AM — before service starts"
+        ],
+        "Post-Service": [
+          "Debrief team after service",
+          "Log any issues or follow-up items",
+          "Confirm next week's schedule in PCO"
+        ]
+      },
+      reminders: [
+        "Call all service cues live",
+        "Keep service timeline on track",
+        "Communicate with Production Team, Stage, and speaker",
+        "Monitor all stations"
+      ]
+    },
+    monday: {
+      checklist: {
+        "Rehearsal": [
+          "Listen to songs before you arrive",
+          "Lead team huddle (service order, prayer)",
+          "Confirm all stations are set",
+          "Team of Teams Huddle — manage flow and transition of songs",
+          "Run Cue-to-Cue pre-checks",
+          "Run Service Sync Meeting"
+        ]
+      },
+      reminders: []
+    }
+  }
+];
+
+const RES = {
+  propresenter: [
+    ["Tutorial Series #1", "https://youtube.com/playlist?list=PL9dcMXSRCi0nW3ixuJ0gyBlxWIITIzyZC"],
+    ["Tutorial Series #2", "https://youtube.com/playlist?list=PL9dcMXSRCi0nB9prdIM38y3mJ103kOs_L"],
+    ["Tutorial Series #3", "https://youtube.com/playlist?list=PL9dcMXSRCi0ll7xT6z7S3HVj8GmTZUchv"],
+    ["Tutorial Series #4", "https://youtube.com/playlist?list=PL9dcMXSRCi0k-35BhsD5ZfBUqB8QgbbtP"]
+  ],
+  audio: [
+    ["Tutorial Series #1", "https://youtube.com/playlist?list=PLZNYaC2mTs0h-Y2sWMvVP4GftI-ORt-9T"],
+    ["Tutorial Series #2", "https://youtube.com/playlist?list=PL7FlZvuV3L--zsuAgl_OEoIem9ukGkiQv"],
+    ["Input / Output Sheet", "https://docs.google.com/spreadsheets/d/100vi-vu8F5HFKHPMByXiJlvUlQP25eIuGzKYKKu6iWI/edit?usp=sharing"]
+  ],
+  lights: [
+    ["Tutorial Series #1", "https://youtube.com/playlist?list=PLEyo6_xbT5EAvlXA719O0YxnmceEc-Fvx"],
+    ["Tutorial Series #2", "https://youtube.com/playlist?list=PL7FlZvuV3L-9Gg8a0ja9KklGoBeQPS9yD"]
+  ],
+  worship: [
+    ["Song Bank (Apple Music)", "https://music.apple.com/us/playlist/tw-song-bank/pl.u-leyl8bPI9Px4Xq"]
+  ]
+};
+
+// ---------- LIVE SYNC (optional — paste your deployed Google Apps Script Web App URL below) ----------
+// Leave blank to run in local-only mode (each device keeps its own checkmarks).
+const SYNC_URL = "https://script.google.com/macros/s/AKfycbxZCVhvPondtrvckv5Izq_aRQO-A7Ql8Xvci4-J7YP5Gcv0D1SIiSqF1z-qqnstFKEFag/exec";
+
+// ---- Sync status tracking + badge ----
+const syncStatus = { state: "idle", lastSuccess: null }; // state: idle | ok | bad
+
+function markSyncSuccess() {
+  syncStatus.state = "ok";
+  syncStatus.lastSuccess = Date.now();
+  renderSyncBadge();
+}
+function markSyncFailure() {
+  syncStatus.state = "bad";
+  renderSyncBadge();
+}
+
+function timeAgo(ms) {
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 5) return "just now";
+  if (s < 60) return s + "s ago";
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + "m ago";
+  const h = Math.floor(m / 60);
+  return h + "h ago";
+}
+
+function renderSyncBadge() {
+  const el = document.getElementById("sync-status-badge");
+  if (!el) return;
+  if (!SYNC_URL) { el.style.display = "none"; return; }
+  el.style.display = "inline-flex";
+  if (syncStatus.state === "ok") {
+    el.className = "sync-badge ok";
+    el.textContent = "● Live sync: connected" + (syncStatus.lastSuccess ? " · synced " + timeAgo(syncStatus.lastSuccess) : "");
+  } else if (syncStatus.state === "bad") {
+    el.className = "sync-badge bad";
+    el.textContent = "● Live sync: offline" + (syncStatus.lastSuccess ? " · last synced " + timeAgo(syncStatus.lastSuccess) : " · retrying");
+  } else {
+    el.className = "sync-badge";
+    el.textContent = "● Connecting…";
+  }
+}
+setInterval(renderSyncBadge, 15000);
+
+async function fetchWithRetry(url, opts, retries, delayMs) {
+  retries = retries == null ? 2 : retries;
+  delayMs = delayMs == null ? 600 : delayMs;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, opts);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res;
+    } catch (e) {
+      if (attempt === retries) throw e;
+      await new Promise(r => setTimeout(r, delayMs * (attempt + 1)));
+    }
+  }
+}
+
+async function syncFetch(action, params) {
+  if (!SYNC_URL) return null;
+  try {
+    const qs = new URLSearchParams({ action, ...params }).toString();
+    const res = await fetchWithRetry(`${SYNC_URL}?${qs}`, undefined, 2, 600);
+    const data = await res.json();
+    markSyncSuccess();
+    return data;
+  } catch (e) { markSyncFailure(); return null; }
+}
+
+async function syncPush(bucket, weekKey, role, itemKey, checked) {
+  if (!SYNC_URL) return;
+  try {
+    await fetchWithRetry(SYNC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "checklist", bucket, weekKey, role, itemKey, checked })
+    }, 2, 600);
+    markSyncSuccess();
+  } catch (e) { markSyncFailure(); /* offline — localStorage already has this change */ }
+}
+
+async function syncReset(bucket, weekKey, role) {
+  if (!SYNC_URL) return;
+  try {
+    await fetchWithRetry(SYNC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "resetChecklist", bucket, weekKey, role })
+    }, 2, 600);
+    markSyncSuccess();
+  } catch (e) { markSyncFailure(); /* offline — local reset already applied */ }
+}
+
+async function refreshRemoteChecklist(bucket, weekKey, rootState) {
+  const remote = await syncFetch("checklist", { bucket, weekKey });
+  if (!remote) return false;
+  let changed = false;
+  remote.forEach(r => {
+    if (!rootState[r.role]) rootState[r.role] = {};
+    const sec = r.itemKey.split("::")[0];
+    if (!rootState[r.role][sec]) rootState[r.role][sec] = {};
+    if (rootState[r.role][sec][r.itemKey] !== r.checked) {
+      rootState[r.role][sec][r.itemKey] = r.checked;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+// Maps our internal role ids to keywords that match PCO team_position_name values
+const ROLE_POSITION_MATCH = {
+  stage: ["stage"],
+  audio: ["audio"],
+  propresenter: ["propresenter", "presenter"],
+  lighting: ["light"],
+  director: ["production director", "producer"]
+};
+
+let weekTeamData = [];
+
+// Defensive client-side date cleanup: if the backend ever sends a raw ISO
+// timestamp (e.g. stale sheet data, or "2026-07-26T07:00:00.000Z"), reformat
+// it to a clean "Month D, YYYY" with no time component. If it's already a
+// clean label, this passes it through unchanged.
+function formatWeekLabel(raw) {
+  if (!raw) return "";
+  const iso = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) {
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return months[parseInt(iso[2], 10) - 1] + " " + parseInt(iso[3], 10) + ", " + iso[1];
+  }
+  return String(raw).replace(/T\d{2}:\d{2}:\d{2}(\.\d+)?Z?$/, "").trim();
+}
+
+function getAssignedNames(roleId) {
+  const keywords = ROLE_POSITION_MATCH[roleId] || [];
+  const names = [];
+  weekTeamData.forEach(t => {
+    const pos = (t.position || "").toLowerCase();
+    if (keywords.some(k => pos.includes(k)) && t.name) {
+      t.name.split(",").map(n => n.trim()).forEach(n => { if (n && names.indexOf(n) === -1) names.push(n); });
+    }
+  });
+  return names;
+}
+
+function updateAssignedLine(containerId, roleId) {
+  const el = document.getElementById(`${containerId}-assigned`);
+  if (!el) return;
+  const names = getAssignedNames(roleId);
+  if (!names.length) { el.classList.remove("show"); el.textContent = ""; return; }
+  el.textContent = "Scheduled: " + names.join(", ");
+  el.classList.add("show");
+}
+
+async function loadWeekTeamBanner() {
+  const data = await syncFetch("schedule", {});
+  const el = document.getElementById("week-team-banner");
+  weekTeamData = (data && data.team) || [];
+
+  if (el) {
+    if (!weekTeamData.length) {
+      el.style.display = "none";
+    } else {
+      const cleanLabel = escapeHtml(formatWeekLabel(data.weekLabel));
+      const planLink = data.planWebUrl
+        ? ` <a href="${escapeHtml(data.planWebUrl)}" target="_blank" rel="noopener" class="vid-link" onclick="event.stopPropagation()">View full plan ↗</a>`
+        : "";
+      el.innerHTML = `<strong>This week's team${cleanLabel ? " — " + cleanLabel : ""}:</strong>${planLink} ` +
+        weekTeamData.map(t => `${escapeHtml(t.position)}: ${escapeHtml(t.name)}`).join(" &nbsp;·&nbsp; ");
+      el.style.display = "block";
+    }
+  }
+
+  if (document.getElementById("sunday").classList.contains("active")) {
+    updateAssignedLine("sunday-role-card", activeSundayRole);
+  }
+  if (document.getElementById("monday").classList.contains("active")) {
+    updateAssignedLine("monday-role-card", activeMondayRole);
+  }
+}
+
+// ---------- Live Order of Service (role-aware) ----------
+let oosItems = [];
+let oosState = {};
+const ITEM_TYPE_ICON = { song: "🎵", media: "🎬", header: "▸" };
+
+// Which fields each role sees on the Order of Service card, and whether
+// they get checkboxes. "notes" keywords are matched case-insensitively
+// against whatever category names your PCO plan's Item Notes actually use
+// (e.g. "Leader", "Person/Mic", "LED Screen", "Notes - Vocal").
+const OOS_ROLE_CONFIG = {
+  propresenter: {
+    label: "Order of Service",
+    tagline: "Live from Planning Center — check off each part once it's built and ready.",
+    checkable: true,
+    fields: [
+      { key: "description", label: null },
+      { key: "notes", label: "LED Screen", keywords: ["led", "screen"] },
+      { key: "arrangementInfo", label: "Sequence" },
+      { key: "lyricsPdfUrl", label: "Lyrics / Chords", type: "link" }
+    ]
+  },
+  audio: {
+    label: "Order of Service",
+    tagline: "Live from Planning Center — reference for who's leading and mic assignments.",
+    checkable: false,
+    showVocalsNotes: true,
+    fields: [
+      { key: "description", label: null },
+      { key: "notes", label: "Leader", keywords: ["leader"], boldValue: true },
+      { key: "notes", label: "Person/Mic", keywords: ["person", "mic"] }
+    ]
+  },
+  director: {
+    label: "Order of Service",
+    tagline: "Live from Planning Center — full run of show.",
+    checkable: false,
+    showVocalsNotes: true,
+    fields: [
+      { key: "description", label: null },
+      { key: "notes", label: "Leader", keywords: ["leader"], boldValue: true },
+      { key: "notes", label: "Person/Mic", keywords: ["person", "mic"] },
+      { key: "notes", label: "LED Screen", keywords: ["led", "screen"] },
+      { key: "notes", label: "Vocals", keywords: ["vocal"] },
+      { key: "arrangementInfo", label: "Sequence" },
+      { key: "lyricsPdfUrl", label: "Lyrics / Chords", type: "link" }
+    ]
+  },
+  lighting: {
+    label: "Order of Service",
+    tagline: "Live from Planning Center — the run order for Sunday.",
+    checkable: false,
+    fields: []
+  },
+  stage: {
+    label: "Order of Service",
+    tagline: "Live from Planning Center — mic assignments and vocal notes.",
+    checkable: false,
+    showVocalsNotes: true,
+    fields: [
+      { key: "notes", label: "Person/Mic", keywords: ["person", "mic"] }
+    ]
+  }
+};
+
+function getNoteValue(it, keywords) {
+  if (!it.notes) return "";
+  const keys = Object.keys(it.notes);
+  const match = keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw)));
+  return match ? it.notes[match] : "";
+}
+
+let oosVocalsNotes = "";
+
+async function loadOrderOfService(weekKey, roleId) {
+  const container = document.getElementById("sunday-oos-card");
+  if (!container) return;
+
+  const data = await syncFetch("order_of_service", {});
+  if (!data || !data.items || !data.items.length) { container.innerHTML = ""; return; }
+  oosItems = data.items;
+  oosVocalsNotes = data.vocalsNotes || "";
+
+  const cfg = OOS_ROLE_CONFIG[roleId];
+  if (cfg && cfg.checkable) {
+    const remote = await syncFetch("checklist", { bucket: "orderofservice", weekKey });
+    if (remote) remote.forEach(r => { oosState[r.itemKey] = r.checked; });
+  }
+
+  renderOrderOfServiceCard(data.weekLabel, weekKey, roleId);
+}
+
+function renderOrderOfServiceCard(weekLabel, weekKey, roleId) {
+  const container = document.getElementById("sunday-oos-card");
+  if (!container) return;
+  const cfg = OOS_ROLE_CONFIG[roleId];
+  if (!cfg) { container.innerHTML = ""; return; }
+
+  const done = oosItems.filter(it => oosState[it.id]).length;
+  const pct = oosItems.length ? Math.round((done / oosItems.length) * 100) : 0;
+
+  const rows = oosItems.map(it => {
+    const checked = !!oosState[it.id];
+    const cbId = "oos-" + it.id;
+    const icon = ITEM_TYPE_ICON[it.itemType] || "•";
+    const mins = it.length ? Math.round(it.length / 60) : 0;
+    const lenLabel = mins ? ` <span style="color:var(--muted);font-weight:400;">— ${mins} min</span>` : "";
+
+    const detailLines = cfg.fields.map(f => {
+      const rawVal = f.key === "notes" ? getNoteValue(it, f.keywords) : (it[f.key] || "");
+      if (!rawVal) return "";
+      const val = escapeHtml(rawVal);
+      if (f.type === "link") {
+        const label = f.label || "Link";
+        return `<div class="item-body"><a href="${val}" target="_blank" rel="noopener" class="vid-link" onclick="event.stopPropagation()">📄 ${escapeHtml(label)} ↗</a></div>`;
+      }
+      const prefix = f.label ? `<strong>${escapeHtml(f.label)}:</strong> ` : "";
+      const valOut = f.boldValue ? `<strong>${val}</strong>` : val;
+      return `<div class="item-body">${prefix}${valOut}</div>`;
+    }).join("");
+
+    const labelInner = `${icon} ${escapeHtml(it.title)}${lenLabel}`;
+
+    if (cfg.checkable) {
+      return `<li class="${checked ? "checked" : ""}">
+        <input type="checkbox" id="${cbId}" ${checked ? "checked" : ""}>
+        <div class="item-body">
+          <label for="${cbId}">${labelInner}</label>
+          ${detailLines}
+        </div>
+      </li>`;
+    }
+    return `<li class="oos-readonly">
+        <div class="item-body">
+          <div class="oos-readonly-title">${labelInner}</div>
+          ${detailLines}
+        </div>
+      </li>`;
+  }).join("");
+
+  const progressBlock = cfg.checkable ? `
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-label">${done} of ${oosItems.length} ready</div>
+      </div>` : "";
+
+  const vocalsBlock = (cfg.showVocalsNotes && oosVocalsNotes)
+    ? `<div class="section vocals-notes">
+        <h3>Notes: Vocal</h3>
+        <div class="vocals-notes-body">${oosVocalsNotes.split("\n").map(line => escapeHtml(line.trim())).filter(Boolean).join("<br>")}</div>
+      </div>`
+    : "";
+
+  container.innerHTML = `
+    <div class="role-card">
+      <div class="head">
+        <div><h2>${cfg.label}</h2><div class="tagline">${cfg.tagline}</div></div>
+        <div class="badge">${escapeHtml(formatWeekLabel(weekLabel))}</div>
+      </div>
+      ${progressBlock}
+      <div class="section">
+        <ul class="checklist">${rows}</ul>
+      </div>
+      ${vocalsBlock}
+    </div>`;
+
+  if (cfg.checkable) {
+    oosItems.forEach(it => {
+      const cb = document.getElementById("oos-" + it.id);
+      if (!cb) return;
+      cb.addEventListener("change", () => {
+        oosState[it.id] = cb.checked;
+        syncPush("orderofservice", weekKey, roleId, it.id, cb.checked);
+        renderOrderOfServiceCard(weekLabel, weekKey, roleId);
+      });
+    });
+  }
+}
+
+// ---------- STATE / STORAGE ----------
+function getWeekKey(d = new Date()){
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - dayNum + 3);
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(),0,4));
+  const week = 1 + Math.round(((date - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay()+6)%7)) / 7);
+  return date.getUTCFullYear() + "-W" + week;
+}
+const SUNDAY_KEY = "tc-sunday-" + getWeekKey();
+const MONDAY_KEY = "tc-monday-" + getWeekKey();
+
+function loadState(key){
+  try { return JSON.parse(localStorage.getItem(key)) || {}; } catch(e){ return {}; }
+}
+function saveState(key, state){
+  localStorage.setItem(key, JSON.stringify(state));
+}
+
+let sundayState = loadState(SUNDAY_KEY);
+let mondayState = loadState(MONDAY_KEY);
+let activeSundayRole = ROLES[0].id;
+let activeMondayRole = ROLES[0].id;
+
+// ---------- MY NOTES (personal, this device only — never synced to the backend) ----------
+const MY_NOTES_KEY = "tc-my-notes";
+let myNotesSaveTimer = null;
+
+function initMyNotes() {
+  const ta = document.getElementById("my-notes-textarea");
+  const statusEl = document.getElementById("my-notes-status");
+  const clearBtn = document.getElementById("my-notes-clear");
+  if (!ta) return;
+
+  ta.value = localStorage.getItem(MY_NOTES_KEY) || "";
+
+  const setStatus = (text) => { if (statusEl) statusEl.textContent = text; };
+  if (ta.value) setStatus("Saved on this device");
+
+  ta.addEventListener("input", () => {
+    clearTimeout(myNotesSaveTimer);
+    setStatus("Saving…");
+    myNotesSaveTimer = setTimeout(() => {
+      localStorage.setItem(MY_NOTES_KEY, ta.value);
+      setStatus("Saved on this device");
+    }, 400);
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (!ta.value.trim()) return;
+      if (!confirm("Clear your personal notes? This only affects this device and can't be undone.")) return;
+      ta.value = "";
+      localStorage.removeItem(MY_NOTES_KEY);
+      setStatus("Cleared");
+    });
+  }
+}
+
+// ---------- RENDER ----------
+function itemKey(section, idx){ return section + "::" + idx; }
+
+function renderRolePicker(containerId, onClick, activeId){
+  const el = document.getElementById(containerId);
+  el.innerHTML = "";
+  ROLES.forEach(r => {
+    const btn = document.createElement("button");
+    btn.className = "role-pill" + (r.id === activeId ? " active" : "");
+    btn.textContent = r.name;
+    btn.onclick = () => onClick(r.id);
+    el.appendChild(btn);
+  });
+}
+
+function computeProgress(sections, state){
+  let total = 0, done = 0;
+  Object.entries(sections).forEach(([sec, items]) => {
+    items.forEach((_, idx) => {
+      total++;
+      if (state[sec] && state[sec][itemKey(sec, idx)]) done++;
+    });
+  });
+  return { total, done };
+}
+
+function itemText(raw){ return typeof raw === "object" ? raw.text : raw; }
+function itemVideos(raw){ return (typeof raw === "object" && raw.videos) ? raw.videos : []; }
+function videosHtml(videos){
+  if (!videos.length) return "";
+  return `<div class="item-videos">${videos.map(v =>
+    `<a href="${v.url}" target="_blank" rel="noopener" class="vid-link" onclick="event.stopPropagation()">▶ ${v.label}</a>`
+  ).join("")}</div>`;
+}
+
+function buildRemindersBlock(reminders){
+  const block = document.createElement("div");
+  block.className = "reminders-block";
+  const ul = document.createElement("ul");
+  reminders.forEach(raw => {
+    const li = document.createElement("li");
+    li.innerHTML = `${itemText(raw)}${videosHtml(itemVideos(raw))}`;
+    ul.appendChild(li);
+  });
+  block.innerHTML = `<div class="r-head">📌 Live Reminders — during service</div>
+    <div class="r-sub">Reference only, nothing to check off here.</div>`;
+  block.appendChild(ul);
+  return block;
+}
+
+function renderRoleCard(containerId, roleId, data, state, stateKey, callTimeVisible){
+  const role = ROLES.find(r => r.id === roleId);
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  const sections = data.checklist;
+  const reminders = data.reminders || [];
+
+  const card = document.createElement("div");
+  card.className = "role-card";
+
+  const head = document.createElement("div");
+  head.className = "head";
+  head.innerHTML = `<div><h2>${role.name}</h2><div class="tagline">${role.tagline}</div><div class="assigned-line" id="${containerId}-assigned"></div></div>` +
+    (callTimeVisible ? `<div class="badge">${role.callTime}</div>` : "");
+  card.appendChild(head);
+
+  const progWrap = document.createElement("div");
+  progWrap.className = "progress-wrap";
+  progWrap.innerHTML = `<div class="progress-track"><div class="progress-fill" id="${containerId}-fill"></div></div>
+    <div class="progress-label" id="${containerId}-label"></div>`;
+  card.appendChild(progWrap);
+
+  Object.entries(sections).forEach(([sec, items]) => {
+    const secEl = document.createElement("div");
+    secEl.className = "section";
+    secEl.innerHTML = `<h3>${sec}</h3>`;
+    const ul = document.createElement("ul");
+    ul.className = "checklist";
+    items.forEach((raw, idx) => {
+      const text = itemText(raw);
+      const videos = itemVideos(raw);
+      const li = document.createElement("li");
+      const checked = !!(state[sec] && state[sec][itemKey(sec, idx)]);
+      if (checked) li.classList.add("checked");
+      const cbId = `${containerId}-${sec.replace(/\s+/g,'')}-${idx}`;
+      li.innerHTML = `<input type="checkbox" id="${cbId}" ${checked ? "checked" : ""}>
+        <div class="item-body">
+          <label for="${cbId}">${text}</label>
+          ${videosHtml(videos)}
+        </div>`;
+      const cb = li.querySelector("input");
+      cb.addEventListener("change", () => {
+        if (!state[sec]) state[sec] = {};
+        state[sec][itemKey(sec, idx)] = cb.checked;
+        li.classList.toggle("checked", cb.checked);
+        saveState(stateKey, state);
+        updateProgress(containerId, sections, state);
+        const bucket = containerId.startsWith("sunday") ? "sunday" : "monday";
+        syncPush(bucket, getWeekKey(), roleId, itemKey(sec, idx), cb.checked);
+      });
+      ul.appendChild(li);
+    });
+    secEl.appendChild(ul);
+    card.appendChild(secEl);
+
+    // Drop the Live Reminders block right after Pre-Service, before Between Services / Post-Service
+    if (sec === "Pre-Service" && reminders.length) {
+      card.appendChild(buildRemindersBlock(reminders));
+    }
+  });
+
+  // if there's no Pre-Service section (shouldn't happen) but reminders exist, still show them
+  if (!sections["Pre-Service"] && reminders.length) {
+    card.appendChild(buildRemindersBlock(reminders));
+  }
+
+  const resetRow = document.createElement("div");
+  resetRow.className = "reset-row";
+  const resetBtn = document.createElement("button");
+  resetBtn.className = "reset-btn";
+  resetBtn.textContent = "Reset this checklist";
+  resetBtn.onclick = () => {
+    if (!confirm("Reset this checklist for the whole team? This clears every checkmark for everyone, not just this device.")) return;
+    Object.keys(state).forEach(k => delete state[k]);
+    saveState(stateKey, state);
+    const bucket = containerId.startsWith("sunday") ? "sunday" : "monday";
+    syncReset(bucket, getWeekKey(), roleId);
+    if (containerId === "sunday-role-card") renderSundayRole(roleId);
+    else renderMondayRole(roleId);
+  };
+  resetRow.appendChild(resetBtn);
+  card.appendChild(resetRow);
+
+  container.appendChild(card);
+  updateProgress(containerId, sections, state);
+}
+
+function updateProgress(containerId, sections, state){
+  const { total, done } = computeProgress(sections, state);
+  const fill = document.getElementById(`${containerId}-fill`);
+  const label = document.getElementById(`${containerId}-label`);
+  if (!fill || !label) return;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  fill.style.width = pct + "%";
+  label.textContent = `${done} of ${total} complete`;
+}
+
+function renderSundayRole(roleId){
+  activeSundayRole = roleId;
+  renderRolePicker("sunday-role-picker", renderSundayRole, roleId);
+  const role = ROLES.find(r => r.id === roleId);
+  if (!sundayState[roleId]) sundayState[roleId] = {};
+  renderRoleCard("sunday-role-card", roleId, role.sunday, sundayState[roleId], SUNDAY_KEY, true);
+  updateAssignedLine("sunday-role-card", roleId);
+
+  const oosContainer = document.getElementById("sunday-oos-card");
+  if (oosContainer) {
+    if (OOS_ROLE_CONFIG[roleId] && SYNC_URL) {
+      loadOrderOfService(getWeekKey(), roleId);
+    } else {
+      oosContainer.innerHTML = "";
+    }
+  }
+
+  if (SYNC_URL) {
+    refreshRemoteChecklist("sunday", getWeekKey(), sundayState).then(changed => {
+      if (changed && activeSundayRole === roleId) {
+        saveState(SUNDAY_KEY, sundayState);
+        renderRoleCard("sunday-role-card", roleId, role.sunday, sundayState[roleId], SUNDAY_KEY, true);
+      }
+    });
+  }
+}
+
+function renderMondayRole(roleId){
+  activeMondayRole = roleId;
+  renderRolePicker("monday-role-picker", renderMondayRole, roleId);
+  const role = ROLES.find(r => r.id === roleId);
+  if (!mondayState[roleId]) mondayState[roleId] = {};
+  renderRoleCard("monday-role-card", roleId, role.monday, mondayState[roleId], MONDAY_KEY, false);
+  updateAssignedLine("monday-role-card", roleId);
+
+  if (SYNC_URL) {
+    refreshRemoteChecklist("monday", getWeekKey(), mondayState).then(changed => {
+      if (changed && activeMondayRole === roleId) {
+        saveState(MONDAY_KEY, mondayState);
+        renderRoleCard("monday-role-card", roleId, role.monday, mondayState[roleId], MONDAY_KEY, false);
+      }
+    });
+  }
+}
+
+function renderResourceFilter(filterId){
+  const el = document.getElementById("resources-role-picker");
+  if (!el) return;
+  el.innerHTML = "";
+  const options = [{ id: "all", name: "All Resources" }, ...ROLES];
+  options.forEach(r => {
+    const btn = document.createElement("button");
+    btn.className = "role-pill" + (r.id === filterId ? " active" : "");
+    btn.textContent = r.name;
+    btn.onclick = () => renderResourceFilter(r.id);
+    el.appendChild(btn);
+  });
+  document.querySelectorAll(".res-card").forEach(card => {
+    const role = card.dataset.role;
+    const show = filterId === "all" || role === "shared" || role === filterId;
+    card.style.display = show ? "" : "none";
+  });
+}
+
+function renderResourceLinks(id, list){
+  const el = document.getElementById(id);
+  el.innerHTML = "";
+  list.forEach(([label, url]) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${url}" target="_blank" rel="noopener">${label}<small>${url}</small></a>`;
+    el.appendChild(li);
+  });
+}
+
+// ---------- TABS ----------
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tabpanel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ---------- INIT ----------
+renderSundayRole(activeSundayRole);
+renderMondayRole(activeMondayRole);
+renderResourceLinks("res-propresenter", RES.propresenter);
+renderResourceLinks("res-audio", RES.audio);
+renderResourceLinks("res-lights", RES.lights);
+renderResourceLinks("res-worship", RES.worship);
+renderResourceFilter("all");
+initMyNotes();
+
+renderSyncBadge();
+
+if (SYNC_URL) {
+  loadWeekTeamBanner();
+  setInterval(() => {
+    if (document.getElementById("sunday").classList.contains("active")) {
+      renderSundayRole(activeSundayRole);
+      if (OOS_ROLE_CONFIG[activeSundayRole]) loadOrderOfService(getWeekKey(), activeSundayRole);
+    } else if (document.getElementById("monday").classList.contains("active")) {
+      renderMondayRole(activeMondayRole);
+    }
+    loadWeekTeamBanner();
+  }, 20000);
+}
+</script>
+</body>
+</html>

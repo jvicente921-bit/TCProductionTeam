@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Production — Team Training Progress</title>
+<style>
+  :root{
+    --crimson:#C0392B; --crimson-dark:#a5301f; --crimson-tint:#fbebe9;
+    --offwhite:#F7F7F7; --ink:#1a1a1a; --muted:#6b7280; --border:#e6e3e1;
+    --green:#1e8e5a; --green-tint:#eaf7f0; --amber:#a86a1a; --amber-tint:#fdf3e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--offwhite);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:3px solid var(--crimson);outline-offset:2px}
+  header{background:#1a1a1a;color:#fff;padding:18px 16px 16px;border-bottom:4px solid var(--crimson)}
+  header .wrap{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:21px}
+  header h1 span{color:var(--crimson)}
+  header nav{display:flex;gap:8px;flex-wrap:wrap}
+  header a{color:#c9c9c9;font-size:13px;text-decoration:none;border:1px solid #444;padding:7px 12px;border-radius:8px}
+  header a:hover{border-color:var(--crimson);color:#fff}
+  main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+  .lead{color:var(--muted);margin:0 0 16px;max-width:68ch}
+  h2{margin:0 0 4px;font-size:24px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .stat b{display:block;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .stat.ready b{color:var(--green)}
+  .stat.nudge b{color:var(--amber)}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{border:1.5px solid var(--border);background:#fff;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit}
+  .chip[aria-pressed="true"]{background:var(--crimson);border-color:var(--crimson);color:#fff}
+  .btn{border:1px solid var(--border);background:#fff;color:var(--ink);font-weight:600;font-size:13px;padding:8px 12px;border-radius:8px;cursor:pointer;font-family:inherit}
+  .btn:hover{border-color:var(--crimson);color:var(--crimson-dark)}
+  .updated{font-size:12px;color:var(--muted)}
+
+  .list{display:grid;gap:10px}
+  .person{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr);gap:12px 18px;align-items:center}
+  .person.ready{border-left:5px solid var(--green)}
+  .person.nudge{border-left:5px solid var(--amber)}
+  .person.going{border-left:5px solid var(--crimson)}
+  .who h3{margin:0;font-size:16px}
+  .who .meta{font-size:12.5px;color:var(--muted)}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;margin-top:6px}
+  .pill.ready{background:var(--green-tint);color:var(--green)}
+  .pill.nudge{background:var(--amber-tint);color:var(--amber)}
+  .pill.going{background:var(--crimson-tint);color:var(--crimson-dark)}
+  .next{font-size:13px;margin-top:6px}
+  .levels{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+  .lv{text-align:center;font-size:11px;color:var(--muted);min-width:0}
+  .lv .ic{font-size:18px;display:block;filter:grayscale(1);opacity:.45}
+  .lv.started .ic{filter:none;opacity:.8}
+  .lv.done .ic{filter:none;opacity:1}
+  .lv .bar{height:5px;background:#eee;border-radius:999px;overflow:hidden;margin:4px 0 2px}
+  .lv .bar div{height:100%;background:var(--crimson)}
+  .lv.done .bar div{background:var(--green)}
+  .lv .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .lv .sc{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+  @media (max-width:640px){.person{grid-template-columns:1fr}}
+
+  .empty,.err{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;color:var(--muted)}
+  .err{border-color:#f0cfc9;color:var(--crimson-dark)}
+  .skeleton{height:84px;border-radius:14px;background:linear-gradient(90deg,#eee,#f6f6f6,#eee);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  @media (prefers-reduced-motion:reduce){.skeleton{animation:none}}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:10px 16px 40px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>TC Production <span>Team Progress</span></h1>
+    <nav><a href="./">Sunday Checklists</a><a href="training.html">Training</a></nav>
+  </div>
+</header>
+
+<main>
+  <h2>Who's getting Sunday Ready</h2>
+  <p class="lead">Live progress from the Get Sunday Ready training. Anyone who finished the Ready Check is ready to shadow at Thursday rehearsal. People with no activity for 2 weeks are flagged for a nudge.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="chips" role="group" aria-label="Filter">
+      <button class="chip" data-f="all" aria-pressed="true">Everyone</button>
+      <button class="chip" data-f="ready" aria-pressed="false">Ready to shadow</button>
+      <button class="chip" data-f="going" aria-pressed="false">In training</button>
+      <button class="chip" data-f="nudge" aria-pressed="false">Needs a nudge</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center"><span class="updated" id="updated"></span><button class="btn" id="refresh">Refresh</button></div>
+  </div>
+
+  <div class="list" id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+</main>
+
+<footer>PAPA: Presence · Attitude · Passion · Approachability — Together Church Production Team</footer>
+
+<script>
+const SYNC_URL = "https://script.google.com/macros/s/AKfycbxZCVhvPondtrvckv5Izq_aRQO-A7Ql8Xvci4-J7YP5Gcv0D1SIiSqF1z-qqnstFKEFag/exec";
+// Required steps per level (reading + required videos + practice + challenge + quiz). Keep in sync with training.html.
+const LEVELS = [
+  {id:"welcome", icon:"🙌", short:"Welcome", total:7},
+  {id:"stage",   icon:"🎒", short:"Stage",   total:8},
+  {id:"audio",   icon:"🎚️", short:"Audio",   total:11, station:"Audio Engineer"},
+  {id:"pro",     icon:"🖥️", short:"ProPres", total:11, station:"ProPresenter Operator"},
+  {id:"lights",  icon:"💡", short:"Lights",  total:9,  station:"Lighting Tech"},
+  {id:"ready",   icon:"🏆", short:"Ready",   total:2}
+];
+const NUDGE_DAYS = 14;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let people = [], filter = "all";
+
+function parse(rows){
+  const by = {};
+  rows.filter(r => r.checked).forEach(r => {
+    const p = by[r.role] || (by[r.role] = {id:r.role, done:{}, order:{}, pass:{}, best:{}, fin:{}});
+    const [head, val] = String(r.itemKey).split("::");
+    if (head === "name") p.name = val;
+    else if (head === "started") p.started = val;
+    else if (head === "last") p.last = (!p.last || val > p.last) ? val : p.last;
+    else if (head.startsWith("d:")) { const lvl = head.slice(2).split(":")[0]; p.done[lvl] = (p.done[lvl] || 0) + 1; }
+    else if (head.startsWith("order:")) p.order[head.slice(6)] = true;
+    else if (head.startsWith("pass:")) p.pass[head.slice(5)] = true;
+    else if (head.startsWith("best:")) { const l = head.slice(5); p.best[l] = Math.max(p.best[l] || 0, +val || 0); }
+    else if (head.startsWith("fin:")) p.fin[head.slice(4)] = val;
+  });
+  return Object.values(by).filter(p => p.name).map(p => {
+    p.levels = LEVELS.map(l => {
+      const got = (p.done[l.id] || 0) + (p.order[l.id] ? 1 : 0) + (p.pass[l.id] ? 1 : 0);
+      return {...l, pct: Math.min(100, Math.round(got / l.total * 100)), done: !!p.fin[l.id], best: p.best[l.id]};
+    });
+    p.stations = p.levels.filter(l => l.station && l.done);
+    p.ready = !!p.fin.ready;
+    const last = p.last || p.started;
+    p.idleDays = last ? Math.floor((Date.now() - new Date(last + "T12:00:00")) / 864e5) : 0;
+    p.status = p.ready ? "ready" : (p.idleDays >= NUDGE_DAYS ? "nudge" : "going");
+    const current = p.levels.find(l => !l.done && l.pct > 0) || p.levels.find(l => !l.done && !(l.station && p.stations.length && !l.pct));
+    p.next = p.ready
+      ? `Ready to shadow: ${p.stations.map(s => s.station).join(", ")}. Schedule a Thursday rehearsal.`
+      : current ? `Working on ${current.short === "ProPres" ? "ProPresenter" : current.short} (${current.pct}%)` : "Just getting started";
+    return p;
+  });
+}
+
+function fmt(d){ if (!d) return "—"; return new Date(d + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"}); }
+function ago(n){ return n <= 0 ? "today" : n === 1 ? "yesterday" : n + " days ago"; }
+
+function render(){
+  const ready = people.filter(p => p.status === "ready").length;
+  const nudge = people.filter(p => p.status === "nudge").length;
+  const going = people.filter(p => p.status === "going").length;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><b>${people.length}</b><span>Started training</span></div>
+    <div class="stat ready"><b>${ready}</b><span>Ready to shadow</span></div>
+    <div class="stat"><b>${going}</b><span>In training</span></div>
+    <div class="stat nudge"><b>${nudge}</b><span>Needs a nudge (${NUDGE_DAYS}+ days idle)</span></div>`;
+  const order = {ready:0, nudge:1, going:2};
+  const list = people.filter(p => filter === "all" || p.status === filter)
+    .sort((a,b) => order[a.status] - order[b.status] || a.idleDays - b.idleDays || a.name.localeCompare(b.name));
+  const el = document.getElementById("list");
+  if (!people.length){ el.innerHTML = `<div class="empty">No one has started training yet. Share <b>training.html</b> with new team members and they'll appear here.</div>`; return; }
+  if (!list.length){ el.innerHTML = `<div class="empty">No one in this group right now.</div>`; return; }
+  const label = {ready:"✓ Ready to shadow", nudge:"Needs a nudge", going:"In training"};
+  el.innerHTML = list.map(p => `
+    <div class="person ${p.status}">
+      <div class="who">
+        <h3>${esc(p.name)}</h3>
+        <div class="meta">Started ${fmt(p.started)} · Last active ${ago(p.idleDays)}</div>
+        <span class="pill ${p.status}">${label[p.status]}</span>
+        <div class="next">${esc(p.next)}</div>
+      </div>
+      <div class="levels">
+        ${p.levels.map(l => `<div class="lv ${l.done ? "done" : l.pct ? "started" : ""}" title="${esc(l.short)}: ${l.done ? "complete" : l.pct + "%"}${l.best != null ? " · best quiz " + l.best + "%" : ""}">
+          <span class="ic" aria-hidden="true">${l.icon}</span>
+          <div class="bar"><div style="width:${l.done ? 100 : l.pct}%"></div></div>
+          <span class="nm">${esc(l.short)}</span>
+          <span class="sc">${l.done ? "✓" : l.pct ? l.pct + "%" : "–"}</span>
+        </div>`).join("")}
+      </div>
+    </div>`).join("");
+}
+
+async function load(){
+  const btn = document.getElementById("refresh"); btn.disabled = true; btn.textContent = "Loading…";
+  try{
+    const res = await fetch(SYNC_URL + "?" + new URLSearchParams({action:"checklist", bucket:"training", weekKey:"all"}));
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    people = parse(await res.json());
+    render();
+    document.getElementById("updated").textContent = "Updated " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  }catch(e){
+    document.getElementById("list").innerHTML = `<div class="err">Couldn't load team progress. Check your connection and tap Refresh.</div>`;
+  }
+  btn.disabled = false; btn.textContent = "Refresh";
+}
+
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+  filter = c.dataset.f;
+  document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === c));
+  render();
+});
+document.getElementById("refresh").onclick = load;
+load();
+</script>
+</body>
+</html>

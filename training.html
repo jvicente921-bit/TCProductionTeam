@@ -205,9 +205,7 @@ const LEVELS = [
         </dl>
         <p class="note">Scheduling runs through Planning Center (PCO). Accept or decline your dates there, and listen to the week's songs before you arrive.</p>`}
     ],
-    watch:[
-      {id:"mxu-pod", title:"The MxU Podcast (optional)", url:"https://podcasts.apple.com/us/podcast/id1259075142", note:"Church production leaders on serving well. Pick any episode that sounds interesting.", optional:true}
-    ],
+    watch:[],
     practice:[
       {id:"pco", title:"Log in to Planning Center", note:"Make sure you can see your schedule and accept a date."},
       {id:"songs", title:"Open the Song Bank", note:"Listen to two songs from the worship team's song bank.", url:"https://music.apple.com/us/playlist/tw-song-bank/pl.u-leyl8bPI9Px4Xq"}
@@ -430,8 +428,60 @@ const PASS = 0.8;
 // ================== STATE ==================
 const KEY = "tc-training-v1";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
-let S = load() || {name:"", started:null, done:{}, quiz:{}, order:{}, finished:{}};
+const ymd = d => { const x = d ? new Date(d) : new Date(); return new Date(x - x.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function save(){
+  if (S.started) S.lastActive = ymd();
+  saveLocal(); scheduleSync();
+}
+const blank = () => ({name:"", started:null, done:{}, quiz:{}, order:{}, finished:{}});
+let S = load() || blank();
+if (!S.id) S.id = "t-" + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+// ================== TEAM SYNC ==================
+// Shares progress with team leaders through the same Google Apps Script the checklists use.
+// Rows live in the "training" bucket: role = this person's id, itemKey = one fact, checked = true/false.
+const SYNC_URL = "https://script.google.com/macros/s/AKfycbxZCVhvPondtrvckv5Izq_aRQO-A7Ql8Xvci4-J7YP5Gcv0D1SIiSqF1z-qqnstFKEFag/exec";
+const SYNC = {bucket:"training", weekKey:"all"};
+let syncState = "idle";
+function wantedKeys(){
+  const w = new Set();
+  if (!S.started) return w;
+  if (S.name) w.add("name::" + S.name);
+  w.add("started::" + ymd(S.started));
+  if (S.lastActive) w.add("last::" + S.lastActive);
+  Object.keys(S.done).forEach(k => { if (S.done[k]) w.add("d:" + k); });
+  Object.keys(S.order).forEach(k => { if (S.order[k]) w.add("order:" + k); });
+  Object.keys(S.quiz).forEach(k => { const q = S.quiz[k]; if (q.passed) w.add("pass:" + k); if (q.best != null) w.add("best:" + k + "::" + q.best); });
+  Object.keys(S.finished).forEach(k => w.add("fin:" + k + "::" + ymd(S.finished[k])));
+  return w;
+}
+let syncBusy = false, syncAgain = false, syncTimer = null;
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 700); }
+async function syncNow(){
+  if (!SYNC_URL) return;
+  if (syncBusy){ syncAgain = true; return; }
+  syncBusy = true;
+  const want = wantedKeys(), had = new Set(S.synced || []);
+  const ops = [...had].filter(k => !want.has(k)).map(k => [k,false]).concat([...want].filter(k => !had.has(k)).map(k => [k,true]));
+  if (ops.length){ syncState = "saving"; renderSyncLine(); }
+  try{
+    for (const [key, val] of ops){
+      const res = await fetch(SYNC_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body: JSON.stringify({action:"checklist", bucket:SYNC.bucket, weekKey:SYNC.weekKey, role:S.id, itemKey:key, checked:val})});
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (val) had.add(key); else had.delete(key);
+      S.synced = [...had]; saveLocal();
+    }
+    syncState = "ok";
+  }catch(e){ syncState = "offline"; }
+  syncBusy = false; renderSyncLine();
+  if (syncAgain){ syncAgain = false; syncNow(); }
+}
+function renderSyncLine(){
+  const el = document.getElementById("sync-line"); if (!el) return;
+  el.textContent = {saving:"Sharing your progress with team leaders…", ok:"✓ Your progress is shared with team leaders.", offline:"Can't reach the team tracker right now. Your progress is saved here and will share when you're back online.", idle:"Your progress is shared with team leaders."}[syncState];
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -520,7 +570,7 @@ function renderStart(){
       <div class="kv" style="grid-template-columns:auto 1fr">
         <dt>Time</dt><dd>About ${total + 40} minutes for one station, around 2 hours if you do all three. Stop anytime and pick up where you left off.</dd>
         <dt>Pass mark</dt><dd>${Math.round(PASS*100)}% on each quiz. You can retry as many times as you need.</dd>
-        <dt>Saving</dt><dd>Progress saves in this browser on this device.</dd>
+        <dt>Saving</dt><dd>Progress saves in this browser. Your name and progress are shared with Tony and Juan so they know when you're ready.</dd>
       </div>
       <label for="name">Your name</label>
       <div class="row">
@@ -553,7 +603,8 @@ function wireRestore(){
     try{
       const data = JSON.parse(decodeURIComponent(escape(atob($("#restore").value.trim()))));
       if (!data || typeof data.done !== "object") throw 0;
-      S = Object.assign({name:"",started:null,done:{},quiz:{},order:{},finished:{}}, data);
+      S = Object.assign(blank(), data);
+      if (!S.id) S.id = "t-" + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
       save(); toast("Progress loaded."); location.hash = "#map"; route();
     }catch(e){ toast("That code didn't work. Copy the whole code and try again."); }
   };
@@ -584,7 +635,8 @@ function renderMap(){
       </div>`).join("")}
     <div class="group-label">Your progress</div>
     <div class="card plain"><div class="body">
-      <p style="margin:0 0 8px">Progress saves in this browser. To continue on another device, copy this code and load it there.</p>
+      <p style="margin:0 0 4px">Progress saves in this browser. To continue on another device, copy this code and load it there.</p>
+      <p id="sync-line" class="lead" style="margin:0 0 10px;font-size:13px"></p>
       <div class="row"><button class="btn ghost small" id="copy-code">Copy progress code</button><button class="btn ghost small" id="reset">Start over</button></div>
       <textarea id="code-out" hidden readonly aria-label="Your progress code" style="margin-top:8px"></textarea>
     </div></div>`;
@@ -592,11 +644,12 @@ function renderMap(){
     if (b.classList.contains("locked")) { toast("Finish the earlier levels to unlock this one."); return; }
     location.hash = "#level-" + b.dataset.id;
   });
+  renderSyncLine();
   $("#copy-code").onclick = () => copyText(btoa(unescape(encodeURIComponent(JSON.stringify(S)))), $("#code-out"), "Progress code copied.");
   let armed = false;
   $("#reset").onclick = e => {
     if (!armed){ armed = true; e.target.textContent = "Tap again to erase everything"; setTimeout(()=>{armed=false; if(e.target.isConnected) e.target.textContent="Start over";}, 4000); return; }
-    S = {name:"",started:null,done:{},quiz:{},order:{},finished:{}}; save(); location.hash = ""; route();
+    S = Object.assign(blank(), {id:S.id, synced:S.synced}); saveLocal(); syncNow(); location.hash = ""; route();
   };
 }
 
@@ -765,13 +818,13 @@ function renderCert(){
     <div class="card"><div class="head"><h3>Keep learning</h3></div><div class="body resources">
       <a href="https://lightkeyapp.com/help/videos" target="_blank" rel="noopener">Lightkey Tutorial Videos ↗<small>Official lessons on presets, sequences, and control panels.</small></a>
       <a href="https://www.youtube.com/watch?v=M7z-I2eU654" target="_blank" rel="noopener">Volunteer Operator's Guide to ProPresenter 7 ↗<small>Renewed Vision's guide for running a live service.</small></a>
-      <a href="https://podcasts.apple.com/us/podcast/id1259075142" target="_blank" rel="noopener">The MxU Podcast ↗<small>Weekly conversations on church production and leading volunteers.</small></a>
-      <a href="./" >Sunday Checklists ↗<small>The checklists you'll use every week.</small></a>
+      <a href="./">Sunday Checklists and Resources<small>The checklists you'll use every week, plus more training links.</small></a>
     </div></div>`;
   $("#copy-sum").onclick = () => copyText(summary, $("#sum-out"), "Message copied. Paste it in a text to Tony or Juan.");
 }
 
 route();
+if (S.started) scheduleSync();
 </script>
 </body>
 </html>
